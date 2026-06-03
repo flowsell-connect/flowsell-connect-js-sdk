@@ -56,4 +56,18 @@ const usage = await client.usage.get();
 console.log(usage.remaining);
 ```
 
+## Examples
+
+Run the mocked smoke test:
+
+```bash
+node examples/mock-smoke-test.mjs
+```
+
+Run against your FlowSell Connect workspace:
+
+```bash
+FLOWSELL_API_KEY=fsc_your_secret node examples/real-usage.mjs
+```
+
 The package uses the `x-api-key` header. Keep API key secrets in server-side environment variables.
