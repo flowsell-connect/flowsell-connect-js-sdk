@@ -1,5 +1,8 @@
 # FlowSell Connect SDK
 
+[![npm version](https://img.shields.io/npm/v/@flowsell/connect.svg)](https://www.npmjs.com/package/@flowsell/connect)
+[![license](https://img.shields.io/npm/l/@flowsell/connect.svg)](./LICENSE)
+
 Official JavaScript and TypeScript SDK for FlowSell Connect wrapper APIs.
 
 ## Install
