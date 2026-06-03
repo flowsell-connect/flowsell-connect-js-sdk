@@ -1,6 +1,6 @@
 {
   "name": "@flowsell/connect",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Official JavaScript and TypeScript SDK for FlowSell Connect wrapper APIs.",
   "type": "module",
   "license": "MIT",
@@ -8,10 +8,10 @@
   "homepage": "https://connect.flowsell.app/docs",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/the-devesta/flowsell-connect-js-sdk.git"
+    "url": "git+https://github.com/flowsell-connect/flowsell-connect-js-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/the-devesta/flowsell-connect-js-sdk/issues"
+    "url": "https://github.com/flowsell-connect/flowsell-connect-js-sdk/issues"
   },
   "keywords": [
     "flowsell",
