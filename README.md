@@ -59,14 +59,4 @@ const usage = await client.usage.get();
 console.log(usage.remaining);
 ```
 
-## Publish
-
-```bash
-cd /Users/adityagarg/AGX/flowsell-connect-js-sdk
-npm install
-npm run build
-npm login
-npm publish --access public
-```
-
 The package uses the `x-api-key` header. Keep API key secrets in server-side environment variables.
