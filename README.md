@@ -8,12 +8,6 @@ Official JavaScript and TypeScript SDK for FlowSell Connect wrapper APIs.
 npm install @flowsell/connect
 ```
 
-For local testing before npm publish:
-
-```bash
-npm install /Users/adityagarg/AGX/flowsell-connect-js-sdk
-```
-
 ## Configure
 
 ```bash

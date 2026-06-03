@@ -8,7 +8,7 @@
   "homepage": "https://connect.flowsell.app/docs",
   "repository": {
     "type": "git",
-    "url": "https://github.com/the-devesta/flowsell-connect-js-sdk.git"
+    "url": "git+https://github.com/the-devesta/flowsell-connect-js-sdk.git"
   },
   "bugs": {
     "url": "https://github.com/the-devesta/flowsell-connect-js-sdk/issues"
