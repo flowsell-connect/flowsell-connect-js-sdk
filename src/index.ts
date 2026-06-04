@@ -9,20 +9,62 @@ export type FlowSellRequestOptions = {
   headers?: HeadersInit;
 };
 
-export type SendTextInput = {
+export type MessageChannel = "whatsapp" | "instagram" | "telegram" | "facebook" | "slack" | "discord" | "sms" | "viber" | "wechat" | "line";
+
+export type SendMessageInput = {
+  channel?: MessageChannel;
   to: string;
-  text: string;
-  phoneNumberId?: string;
+  message: string;
 };
 
+export type SendTextInput = SendMessageInput & {
+  text?: string;
+};
+
+export type TemplateVariables = Record<string, string | number | boolean | null>;
+
 export type SendTemplateInput = {
+  channel?: MessageChannel;
   to: string;
+  template: string;
+  variables?: TemplateVariables;
+  language?: string;
+  category?: string;
+  countryCode?: string;
+};
+
+export type TemplateButtonInput = {
+  type: "url" | "phone" | "reply" | "quick_reply";
+  text: string;
+  url?: string;
+  phoneNumber?: string;
+};
+
+export type CreateTemplateInput = {
+  channel?: MessageChannel;
   name: string;
-  language: string;
-  category: string;
-  countryCode: string;
-  components?: unknown[];
-  phoneNumberId?: string;
+  category: "UTILITY" | "MARKETING" | "AUTHENTICATION" | string;
+  language?: string;
+  content: string;
+  headerType?: "TEXT" | "IMAGE" | "DOCUMENT" | "VIDEO" | "NONE";
+  headerText?: string;
+  buttons?: TemplateButtonInput[];
+  sampleVariables?: TemplateVariables;
+};
+
+export type ListTemplatesInput = {
+  channel?: MessageChannel;
+  limit?: number;
+};
+
+export type GetTemplateInput = {
+  channel?: MessageChannel;
+  name: string;
+};
+
+export type DeleteTemplateInput = {
+  channel?: MessageChannel;
+  name: string;
 };
 
 export type UsageResponse = {
@@ -75,14 +117,23 @@ export class FlowSell {
     this.fetcher = config.fetch || fetch;
 
     this.messages = {
-      sendText: (input, options) =>
-        this.request("/v1/messages/text", {
+      send: (input, options) =>
+        this.request("/v1/messages/send", {
           method: "POST",
           body: input,
           ...options,
         }),
+      sendText: (input, options) =>
+        this.request("/v1/messages/send", {
+          method: "POST",
+          body: {
+            ...input,
+            message: input.message || input.text || "",
+          },
+          ...options,
+        }),
       sendTemplate: (input, options) =>
-        this.request("/v1/messages/templates", {
+        this.request("/v1/messages/template", {
           method: "POST",
           body: input,
           ...options,
@@ -107,9 +158,44 @@ export class FlowSell {
         };
       },
     };
+
+    this.templates = {
+      list: (input = {}, options) => {
+        const params = new URLSearchParams();
+        if (input.limit) params.set("limit", String(input.limit));
+        const query = params.toString();
+        return this.request(`/v1/templates${query ? `?${query}` : ""}`, {
+          method: "GET",
+          ...options,
+        });
+      },
+      get: (input, options) => {
+        const name = typeof input === "string" ? input : input.name;
+        return this.request(`/v1/templates/${encodeURIComponent(name)}`, {
+          method: "GET",
+          ...options,
+        });
+      },
+      create: (input, options) =>
+        this.request("/v1/templates", {
+          method: "POST",
+          body: input,
+          ...options,
+        }),
+      delete: (input, options) =>
+        this.request("/v1/templates/delete", {
+          method: "POST",
+          body: input,
+          ...options,
+        }),
+    };
   }
 
   messages: {
+    send: (
+      input: SendMessageInput,
+      options?: FlowSellRequestOptions,
+    ) => Promise<unknown>;
     sendText: (
       input: SendTextInput,
       options?: FlowSellRequestOptions,
@@ -122,6 +208,25 @@ export class FlowSell {
 
   usage: {
     get: (options?: FlowSellRequestOptions) => Promise<UsageResponse>;
+  };
+
+  templates: {
+    list: (
+      input?: ListTemplatesInput,
+      options?: FlowSellRequestOptions,
+    ) => Promise<unknown>;
+    get: (
+      input: string | GetTemplateInput,
+      options?: FlowSellRequestOptions,
+    ) => Promise<unknown>;
+    create: (
+      input: CreateTemplateInput,
+      options?: FlowSellRequestOptions,
+    ) => Promise<unknown>;
+    delete: (
+      input: DeleteTemplateInput,
+      options?: FlowSellRequestOptions,
+    ) => Promise<unknown>;
   };
 
   async request<T = unknown>(
