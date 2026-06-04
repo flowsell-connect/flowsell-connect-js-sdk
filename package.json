@@ -1,6 +1,6 @@
 {
   "name": "@flowsell/connect",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Official JavaScript and TypeScript SDK for FlowSell Connect wrapper APIs.",
   "type": "module",
   "license": "MIT",
