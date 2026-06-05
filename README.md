@@ -30,6 +30,7 @@ const client = new FlowSell({
 
 const result = await client.messages.send({
   channel: "whatsapp",
+  phoneNumberId: "1131858666672190",
   to: "+919999999999",
   message: "Hello from FlowSell Connect SDK",
 });
@@ -44,6 +45,7 @@ Create templates with named variables. FlowSell extracts and maps provider varia
 ```ts
 await client.templates.create({
   channel: "whatsapp",
+  phoneNumberId: "1131858666672190",
   name: "order_update",
   category: "UTILITY",
   content: `Hello {{customer_name}}
@@ -63,6 +65,7 @@ console.log(template);
 
 await client.messages.sendTemplate({
   channel: "whatsapp",
+  phoneNumberId: "1131858666672190",
   to: "+919999999999",
   template: "order_update",
   variables: {
@@ -72,7 +75,78 @@ await client.messages.sendTemplate({
 });
 ```
 
-FlowSell Connect builds provider-specific payloads internally. SDK examples should not require Graph URLs, WABA IDs, phone-number IDs, access tokens, or raw provider payloads.
+FlowSell Connect builds provider-specific payloads internally. SDK examples should not require Graph URLs, WABA IDs, access tokens, or raw provider payloads.
+
+`phoneNumberId` is optional when the workspace has one active number. Pass it when your API key can send from multiple connected WhatsApp numbers.
+
+## Media
+
+Upload media from a public URL, list uploaded media IDs, and reuse them in messages.
+
+```ts
+const media = await client.media.upload({
+  channel: "whatsapp",
+  phoneNumberId: "1131858666672190",
+  url: "https://example.com/invoice.pdf",
+  filename: "invoice.pdf",
+});
+
+const library = await client.media.list({
+  channel: "whatsapp",
+  phoneNumberId: "1131858666672190",
+});
+
+await client.messages.send({
+  channel: "whatsapp",
+  phoneNumberId: "1131858666672190",
+  to: "+919999999999",
+  type: "document",
+  mediaId: media.id,
+  filename: "invoice.pdf",
+});
+```
+
+## Interactive Messages
+
+Use the same `client.messages.send(...)` method for service-window interactions. FlowSell builds the provider-specific interactive payload internally.
+
+Reply buttons:
+
+```ts
+await client.messages.send({
+  channel: "whatsapp",
+  phoneNumberId: "1131858666672190",
+  to: "+919999999999",
+  type: "buttons",
+  body: "Choose an option",
+  buttons: [
+    { type: "reply", reply: { id: "yes", title: "Yes" } },
+    { type: "reply", reply: { id: "no", title: "No" } },
+  ],
+});
+```
+
+Native WhatsApp Flow:
+
+```ts
+await client.messages.send({
+  channel: "whatsapp",
+  phoneNumberId: "1131858666672190",
+  to: "+919999999999",
+  type: "flow",
+  body: "Complete your order details.",
+  flowId: "1234567890",
+  flowCta: "Open form",
+  flowToken: "order_123",
+  flowAction: "navigate",
+  flowScreen: "ORDER_DETAILS",
+  flowData: {
+    order_id: "#1234",
+  },
+});
+```
+
+Other supported service-window message types include `list`, `cta_url`, `carousel`, `location`, `location_request`, `address`, `contacts`, `reaction`, and media types such as `image`, `audio`, `video`, `document`, and `sticker`.
 
 ## Advanced Templates
 
@@ -81,6 +155,7 @@ URL buttons:
 ```ts
 await client.templates.create({
   channel: "whatsapp",
+  phoneNumberId: "1131858666672190",
   name: "track_order",
   category: "UTILITY",
   content: `Hello {{customer_name}}
@@ -106,6 +181,7 @@ Quick replies:
 ```ts
 await client.templates.create({
   channel: "whatsapp",
+  phoneNumberId: "1131858666672190",
   name: "feedback_request",
   category: "UTILITY",
   content: `Hello {{customer_name}}
@@ -114,6 +190,23 @@ Was your experience satisfactory?`,
     { type: "reply", text: "Yes" },
     { type: "reply", text: "No" },
   ],
+});
+```
+
+Send approved media-header templates with the same simple contract:
+
+```ts
+await client.messages.sendTemplate({
+  channel: "whatsapp",
+  phoneNumberId: "1131858666672190",
+  to: "+919999999999",
+  template: "invoice_ready",
+  headerType: "document",
+  headerMediaId: "uploaded_document_media_id",
+  headerFilename: "invoice.pdf",
+  variables: {
+    invoice_id: "INV-1001",
+  },
 });
 ```
 

@@ -4,6 +4,7 @@ const client = new FlowSell({
   apiKey: process.env.FLOWSELL_API_KEY,
   baseUrl: process.env.FLOWSELL_API_BASE_URL,
 });
+const phoneNumberId = process.env.FLOWSELL_PHONE_NUMBER_ID;
 
 async function main() {
   const usage = await client.usage.get();
@@ -12,6 +13,7 @@ async function main() {
   if (process.env.FLOWSELL_TEST_CREATE_TEMPLATE === '1') {
     const template = await client.templates.create({
       channel: 'whatsapp',
+      ...(phoneNumberId ? { phoneNumberId } : {}),
       name: process.env.FLOWSELL_TEST_TEMPLATE_NAME || 'track_order',
       category: 'UTILITY',
       content: `Hello {{customer_name}}
@@ -36,6 +38,7 @@ Track your order using the button below.`,
   if (process.env.FLOWSELL_TEST_RECIPIENT) {
     const message = await client.messages.send({
       channel: 'whatsapp',
+      ...(phoneNumberId ? { phoneNumberId } : {}),
       to: process.env.FLOWSELL_TEST_RECIPIENT,
       message: 'Hello from FlowSell Connect SDK',
     });

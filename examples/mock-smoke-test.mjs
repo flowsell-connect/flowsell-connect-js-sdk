@@ -22,6 +22,7 @@ const client = new FlowSell({
 const usage = await client.usage.get();
 await client.messages.send({
   channel: 'whatsapp',
+  phoneNumberId: '1131858666672190',
   to: '+919999999999',
   message: 'Hello from FlowSell Connect SDK',
 });

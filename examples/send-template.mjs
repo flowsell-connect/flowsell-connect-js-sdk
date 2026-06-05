@@ -7,6 +7,7 @@ const client = new FlowSell({
 
 const to = process.env.FLOWSELL_TEST_RECIPIENT;
 const template = process.env.FLOWSELL_TEST_TEMPLATE_NAME || 'order_update_en';
+const phoneNumberId = process.env.FLOWSELL_PHONE_NUMBER_ID;
 
 if (!to) {
   throw new Error('Set FLOWSELL_TEST_RECIPIENT to the WhatsApp number you want to message.');
@@ -18,6 +19,7 @@ async function main() {
 
   const result = await client.messages.sendTemplate({
     channel: 'whatsapp',
+    ...(phoneNumberId ? { phoneNumberId } : {}),
     to,
     template,
     language: process.env.FLOWSELL_TEST_TEMPLATE_LANGUAGE || 'en_US',

@@ -14,7 +14,59 @@ export type MessageChannel = "whatsapp" | "instagram" | "telegram" | "facebook" 
 export type SendMessageInput = {
   channel?: MessageChannel;
   to: string;
-  message: string;
+  phoneNumberId?: string;
+  message?: string;
+  text?: string;
+  type?:
+    | "text"
+    | "image"
+    | "audio"
+    | "video"
+    | "document"
+    | "sticker"
+    | "location"
+    | "location_request"
+    | "address"
+    | "address_message"
+    | "contacts"
+    | "interactive"
+    | "button"
+    | "buttons"
+    | "reply_buttons"
+    | "list"
+    | "cta_url"
+    | "flow"
+    | "nfm_flow"
+    | "carousel"
+    | "reaction"
+    | string;
+  body?: string;
+  footer?: string;
+  header?: Record<string, unknown>;
+  mediaId?: string;
+  link?: string;
+  caption?: string;
+  filename?: string;
+  location?: Record<string, unknown>;
+  contacts?: unknown[];
+  address?: Record<string, unknown>;
+  buttons?: unknown[];
+  sections?: unknown[];
+  buttonText?: string;
+  displayText?: string;
+  url?: string;
+  flowId?: string;
+  flowCta?: string;
+  flowToken?: string;
+  flowAction?: string;
+  flowScreen?: string;
+  flowData?: Record<string, unknown>;
+  cards?: unknown[];
+  messageId?: string;
+  emoji?: string;
+  reaction?: Record<string, unknown>;
+  interactive?: Record<string, unknown>;
+  payload?: Record<string, unknown>;
 };
 
 export type SendTextInput = SendMessageInput & {
@@ -26,11 +78,18 @@ export type TemplateVariables = Record<string, string | number | boolean | null>
 export type SendTemplateInput = {
   channel?: MessageChannel;
   to: string;
+  phoneNumberId?: string;
   template: string;
   variables?: TemplateVariables;
   language?: string;
   category?: string;
   countryCode?: string;
+  headerType?: "image" | "video" | "document";
+  headerMediaId?: string;
+  headerMediaLink?: string;
+  headerFilename?: string;
+  components?: unknown[];
+  buttonPayloads?: Array<Record<string, string | number | boolean | null>>;
 };
 
 export type TemplateButtonInput = {
@@ -42,29 +101,48 @@ export type TemplateButtonInput = {
 
 export type CreateTemplateInput = {
   channel?: MessageChannel;
+  phoneNumberId?: string;
   name: string;
   category: "UTILITY" | "MARKETING" | "AUTHENTICATION" | string;
   language?: string;
   content: string;
   headerType?: "TEXT" | "IMAGE" | "DOCUMENT" | "VIDEO" | "NONE";
   headerText?: string;
+  sampleMediaHandle?: string;
   buttons?: TemplateButtonInput[];
   sampleVariables?: TemplateVariables;
 };
 
 export type ListTemplatesInput = {
   channel?: MessageChannel;
+  phoneNumberId?: string;
   limit?: number;
 };
 
 export type GetTemplateInput = {
   channel?: MessageChannel;
+  phoneNumberId?: string;
   name: string;
 };
 
 export type DeleteTemplateInput = {
   channel?: MessageChannel;
+  phoneNumberId?: string;
   name: string;
+};
+
+export type UploadMediaInput = {
+  channel?: MessageChannel;
+  phoneNumberId?: string;
+  url: string;
+  filename?: string;
+  mimeType?: string;
+};
+
+export type ListMediaInput = {
+  channel?: MessageChannel;
+  phoneNumberId?: string;
+  limit?: number;
 };
 
 export type UsageResponse = {
@@ -163,6 +241,8 @@ export class FlowSell {
       list: (input = {}, options) => {
         const params = new URLSearchParams();
         if (input.limit) params.set("limit", String(input.limit));
+        if (input.phoneNumberId)
+          params.set("phoneNumberId", input.phoneNumberId);
         const query = params.toString();
         return this.request(`/v1/templates${query ? `?${query}` : ""}`, {
           method: "GET",
@@ -171,10 +251,18 @@ export class FlowSell {
       },
       get: (input, options) => {
         const name = typeof input === "string" ? input : input.name;
-        return this.request(`/v1/templates/${encodeURIComponent(name)}`, {
-          method: "GET",
-          ...options,
-        });
+        const phoneNumberId =
+          typeof input === "string" ? undefined : input.phoneNumberId;
+        const params = new URLSearchParams();
+        if (phoneNumberId) params.set("phoneNumberId", phoneNumberId);
+        const query = params.toString();
+        return this.request(
+          `/v1/templates/${encodeURIComponent(name)}${query ? `?${query}` : ""}`,
+          {
+            method: "GET",
+            ...options,
+          },
+        );
       },
       create: (input, options) =>
         this.request("/v1/templates", {
@@ -188,6 +276,26 @@ export class FlowSell {
           body: input,
           ...options,
         }),
+    };
+
+    this.media = {
+      upload: (input, options) =>
+        this.request("/v1/media/upload", {
+          method: "POST",
+          body: input,
+          ...options,
+        }),
+      list: (input = {}, options) => {
+        const params = new URLSearchParams();
+        if (input.limit) params.set("limit", String(input.limit));
+        if (input.phoneNumberId)
+          params.set("phoneNumberId", input.phoneNumberId);
+        const query = params.toString();
+        return this.request(`/v1/media${query ? `?${query}` : ""}`, {
+          method: "GET",
+          ...options,
+        });
+      },
     };
   }
 
@@ -225,6 +333,17 @@ export class FlowSell {
     ) => Promise<unknown>;
     delete: (
       input: DeleteTemplateInput,
+      options?: FlowSellRequestOptions,
+    ) => Promise<unknown>;
+  };
+
+  media: {
+    upload: (
+      input: UploadMediaInput,
+      options?: FlowSellRequestOptions,
+    ) => Promise<unknown>;
+    list: (
+      input?: ListMediaInput,
       options?: FlowSellRequestOptions,
     ) => Promise<unknown>;
   };
